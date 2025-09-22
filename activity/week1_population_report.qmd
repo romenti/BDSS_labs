@@ -1,0 +1,124 @@
+---
+title: "Week 1 — Reproducible Report: World Population Growth"
+author: "Group <X>"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    number-sections: true
+    df-print: paged
+  pdf: default
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: auto   # cache results for speed/reproducibility
+editor: visual
+---
+
+```{r}
+#| label: setup
+#| include: false
+# Global setup
+library(tidyverse)
+data_path <- "data/UNpop_messy.csv"
+output_csv <- "outputs/clean_population_results.csv"
+output_png <- "outputs/population_growth_plot.png"
+```
+
+## 1. Introduction
+
+This report demonstrates a minimal, **reproducible workflow** in R using Quarto.\
+We analyze world population totals and compute the **percentage increase relative to 1950**.
+
+**Learning goals** - Use tidyverse pipes (`|>`) for readable data workflows. - Keep code and narrative in one place (literate programming). - Save analysis outputs to a project-relative `outputs/` folder.
+
+## 2. Data
+
+```{r}
+#| label: load-data
+#| tbl-cap: "Input data: world population by year."
+unpop <- read_csv(data_path)
+glimpse(unpop)
+unpop
+```
+
+> **Note.** This file should be stored at `data/UNpop_messy.csv` inside your R Project.
+
+## 3. Methods
+
+We compute: - `ratio = world.pop / first(world.pop)`\
+- `percent = round((ratio - 1) * 100, 1)`\
+We also flag years with increases above **120%** to illustrate basic logical tagging.
+
+```{r}
+#| label: transform
+pop_growth <-
+  unpop |>
+  mutate(
+    ratio = world.pop / first(world.pop),
+    percent = round((ratio - 1) * 100, 1),
+    high_growth_flag = percent > 120
+  )
+
+pop_growth
+```
+
+## 4. Results
+
+### 4.1 Trend plot
+
+```{r}
+#| label: plot
+#| fig-cap: "World population increase since 1950 (percentage points)."
+pop_plot <-
+  ggplot(pop_growth, aes(x = year, y = percent)) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 2.8) +
+  geom_hline(yintercept = 120, linetype = "dashed") +
+  labs(
+    title = "World Population Growth Since 1950",
+    subtitle = "Percentage increase relative to 1950",
+    x = "Year",
+    y = "Population increase (%)"
+  ) +
+  theme_minimal()
+
+pop_plot
+```
+
+```{r}
+#| label: save-plot-and-data
+# Save outputs to the project folder for reuse
+dir.create("outputs", showWarnings = FALSE)
+ggsave(filename = output_png, plot = pop_plot, width = 7, height = 5, dpi = 300)
+pop_growth |> arrange(year) |> write_csv(output_csv)
+```
+
+### 4.2 Key summary
+
+```{r}
+#| label: summary
+pop_growth |>
+  summarise(
+    first_year = first(year),
+    last_year  = last(year),
+    increase_pct_points = last(percent) - first(percent),
+    max_percent = max(percent),
+    max_year = year[which.max(percent)]
+  )
+```
+
+## 5. Reproducibility Checklist
+
+-   [ ] Code runs top-to-bottom without manual edits.\
+-   [ ] All paths are **relative** to the project root (no `setwd()` or absolute paths).\
+-   [ ] Data and outputs live under `data/` and `outputs/`.\
+-   [ ] Randomness controlled (not used here; otherwise set seeds).\
+-   [ ] Documented methods and assumptions in the text above.\
+-   [ ] Add the file to GitHub once complete.
+
+## 6. Discussion
+
+Briefly discuss: - What can (and can’t) we learn from this tiny example? - How would you extend the analysis (more years, regions, uncertainty)? - What are potential **sources of error** or **bias**?
