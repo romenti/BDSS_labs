@@ -22,7 +22,7 @@ editor: visual
 #| include: false
 # Global setup
 library(tidyverse)
-data_path <- "data/UNpop_messy.csv"
+data_path <- "data/UNdata.txt"
 output_csv <- "outputs/clean_population_results.csv"
 output_png <- "outputs/population_growth_plot.png"
 ```
@@ -39,6 +39,7 @@ We analyze world population totals and compute the **percentage increase relativ
 ```{r}
 #| label: load-data
 #| tbl-cap: "Input data: world population by year."
+setwd("/Users/riccardoomenti/Library/Mobile Documents/com~apple~CloudDocs/BDSS_Labs/BDSS_labs/Lab1/")
 unpop <- read_csv(data_path)
 glimpse(unpop)
 unpop

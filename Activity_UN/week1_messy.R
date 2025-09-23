@@ -2,9 +2,9 @@
 ## NOTE: this script is intentionally BAD. Students should refactor it.
 
 # who cares about working directories lol
-setwd("~/Downloads/writingcode/week1")  # <- breaks for everyone else
 
-x = read.csv("data/UNpop_messy.csv")   # stringsAsFactors? meh
+
+x = read.csv("data/UNdata.txt")   # stringsAsFactors? meh
 
 # unnecessary packages + inconsistent usage
 suppressMessages(library(tidyverse))
@@ -84,7 +84,7 @@ xx$pc2  <- round((xx$rat2-1)*100, 2)
 xx <- xx[, c("year", "year_num", "WORLD_pop", "pc2", "p", "R", "P", "flag", "RATIO", "Perc")]
 
 # save to a place no one else has
-write.csv(xx, "/Users/nicola/Desktop/output_final.csv", row.names=F)
+write.csv(xx, "~/Library/Mobile Documents/com~apple~CloudDocs/BDSS_Labs/BDSS_labs/Lab1/output_final.csv", row.names=F)
 
 # print something unreadable
 print(xx[ , c(1,3,4,5)])
